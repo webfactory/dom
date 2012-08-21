@@ -1,0 +1,7 @@
+{
+    "name": "webfactory/dom",
+    "autoload": {
+        "psr-0": { "Webfactory\\Dom": "src" }
+    },
+    "target-dir": "Webfactory/Dom"
+}
