@@ -56,6 +56,19 @@ abstract class BaseParser {
         return $this->fixDump($element->ownerDocument->saveXML($element));
     }
 
+    public function queryXPath(\DOMDocument $document, $expression, array $namespaces = array('html' => 'http://www.w3.org/1999/xhtml')) {
+        $xml = '';
+        $xpath = new \DOMXPath($document);
+        foreach ($namespaces as $nsName => $nsURI) {
+            // TODO: Automatisch alle Namespaces registrieren (aus $document parsen)...
+            $xpath->registerNamespace($nsName, $nsURI);
+        }
+        foreach ($xpath->query($expression) as $node) {
+            $xml .= $this->dumpElement($node);
+        }
+        return $xml;
+    }
+
     protected function createDOMDocument() {
         $d = new \DOMDocument();
         $d->resolveExternals = true; // Externe Dateien (aus der DTD) bei der Auflösung von Entities beachten. Falls nicht, sind die Entities nicht bekannt.
