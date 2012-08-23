@@ -7,9 +7,7 @@ use Webfactory\Dom\BaseParser;
 class PolyglotHTML5Parser extends BaseParser {
 
     protected function wrapFragment($fragmentXml) {
-        return '<html xmlns:esi="http://www.edge-delivery.org/esi/1.0" xmlns="'.self::XHTMLNS.'">'
-            . $fragmentXml
-            . '</html>';
+        return $this->wrapWithRootNode($fragmentXml);
     }
 
     protected function fixDump($dump) {

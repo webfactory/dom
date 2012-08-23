@@ -7,7 +7,12 @@ use Webfactory\Dom\Exception\ParsingException;
 
 abstract class BaseParser {
 
-    const XHTMLNS = 'http://www.w3.org/1999/xhtml';
+    protected $standardNamespaces = array(
+        'html' => 'http://www.w3.org/1999/xhtml',
+        'esi' => 'http://www.edge-delivery.org/esi/1.0',
+        'fb' => 'http://www.facebook.com/2008/fbml'
+    );
+    protected $defaultNamespace = 'html';
 
     public function parseDocument($xml) {
         if (!$xml)
@@ -26,6 +31,8 @@ abstract class BaseParser {
         if ($d->documentElement == null || $errors)
             throw new ParsingException($errors, $d);
 
+        $d->nonStandardNamespaces = $this->extractNonStandardNamespaces($xml);
+
         return $d;
     }
 
@@ -33,38 +40,50 @@ abstract class BaseParser {
         if (!$fragmentXml)
             throw new EmptyXMLStringException();
 
-        $document = $this->parseDocument($this->wrapFragment($fragmentXml));
+        $xml = $this->wrapFragment($fragmentXml);
+
+        $document = $this->parseDocument($xml);
         $document->createdFromFragment = true;
+        $document->nonStandardNamespaces = $this->extractNonStandardNamespaces($xml);
+
         return $document;
     }
 
     public function dumpDocument(\DOMDocument $document) {
-        if ($document->createdFromFragment) {
+        if (isset($document->createdFromFragment)) {
             $root = $document->documentElement;
 
             $dump = '';
-            // Wir nutzen an dieser Stelle explizit nicht
-            // $this->dumpElement, da wir aus performance-
-            // gruenden $this->fixDump nur einmal rufen wollen.
-            foreach ($root->childNodes as $n)
-                $dump .= $document->saveXML($n);
+            foreach ($root->childNodes as $n) {
+                $dump .= $this->dumpElement($n);
+            }
+            return $dump;
         } else {
-            $dump = $document->saveXML();
+            return $this->fixDump($document->saveXML());
         }
-
-        return $this->fixDump($dump);
     }
 
     public function dumpElement(\DOMNode $element) {
+        if ($element instanceof \DOMElement) {
+            if (isset($element->ownerDocument->nonStandardNamespaces)) {
+                foreach ($element->ownerDocument->nonStandardNamespaces as $ns => $uri) {
+                    $element->setAttribute('xmlns:' . $ns, $uri);
+                }
+            }
+        }
         return $this->fixDump($element->ownerDocument->saveXML($element));
     }
 
-    public function createXPath(\DOMDocument $document, array $namespaces = array('html' => 'http://www.w3.org/1999/xhtml')) {
+    public function createXPath(\DOMDocument $document) {
         $xpath = new \DOMXPath($document);
+        $namespaces = $this->standardNamespaces;
+        if (isset($document->nonStandardNamespaces))
+            $namespaces += $document->nonStandardNamespaces;
+
         foreach ($namespaces as $nsName => $nsURI) {
-            // TODO: Automatisch alle Namespaces registrieren (aus $document parsen)...
             $xpath->registerNamespace($nsName, $nsURI);
         }
+
         return $xpath;
     }
 
@@ -75,8 +94,30 @@ abstract class BaseParser {
         return $d;
     }
 
+    protected function extractNonStandardNamespaces($xml) {
+        preg_match_all('(xmlns:([^=]+)="([^"]+)")', $xml, $matches, PREG_SET_ORDER);
+        $unknownNamespaces = array();
+        foreach ($matches as $match) {
+            $key = $match[1];
+            if (!in_array($key, array_keys($this->standardNamespaces))) {
+                $unknownNamespaces[$key] = $match[2];
+            }
+        }
+        return $unknownNamespaces;
+    }
+
+    protected function wrapWithRootNode($fragmentXML) {
+        $wrap = '<html';
+        foreach ($this->standardNamespaces as $key => $uri) {
+            $wrap .= " xmlns:$key=\"$uri\"";
+        }
+        $wrap .= ' xmlns="' . $this->standardNamespaces[$this->defaultNamespace] . '">';
+        $wrap .= $fragmentXML;
+        $wrap .= '</html>';
+        return $wrap;
+    }
+
     abstract protected function wrapFragment($fragmentXml);
     abstract protected function fixDump($dump);
-
 
 }
