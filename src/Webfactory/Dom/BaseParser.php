@@ -2,7 +2,7 @@
 
 namespace Webfactory\Dom;
 
-use Webfactory\Dom\EmptyXMLStringException;
+use Webfactory\Dom\Exception\EmptyXMLStringException;
 use Webfactory\Dom\Exception\ParsingException;
 
 abstract class BaseParser {

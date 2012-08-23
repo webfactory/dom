@@ -1,6 +1,6 @@
 <?php
 
-namespace Webfactory\Dom;
+namespace Webfactory\Dom\Exception;
 
 class EmptyXMLStringException extends \Exception {
 
