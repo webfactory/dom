@@ -2,6 +2,9 @@
 
 namespace Webfactory\Dom;
 
+use Webfactory\Dom\EmptyXMLStringException;
+use Webfactory\Dom\Exception\ParsingException;
+
 abstract class BaseParser {
 
     const XHTMLNS = 'http://www.w3.org/1999/xhtml';
@@ -21,7 +24,7 @@ abstract class BaseParser {
         libxml_use_internal_errors($errorHandling);
 
         if ($d->documentElement == null || $errors)
-            throw new ParsingException($errors);
+            throw new ParsingException($errors, $d);
 
         return $d;
     }
@@ -52,21 +55,17 @@ abstract class BaseParser {
         return $this->fixDump($dump);
     }
 
-    public function dumpElement(\DOMElement $element) {
+    public function dumpElement(\DOMNode $element) {
         return $this->fixDump($element->ownerDocument->saveXML($element));
     }
 
-    public function queryXPath(\DOMDocument $document, $expression, array $namespaces = array('html' => 'http://www.w3.org/1999/xhtml')) {
-        $xml = '';
+    public function createXPath(\DOMDocument $document, array $namespaces = array('html' => 'http://www.w3.org/1999/xhtml')) {
         $xpath = new \DOMXPath($document);
         foreach ($namespaces as $nsName => $nsURI) {
             // TODO: Automatisch alle Namespaces registrieren (aus $document parsen)...
             $xpath->registerNamespace($nsName, $nsURI);
         }
-        foreach ($xpath->query($expression) as $node) {
-            $xml .= $this->dumpElement($node);
-        }
-        return $xml;
+        return $xpath;
     }
 
     protected function createDOMDocument() {

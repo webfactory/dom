@@ -19,7 +19,7 @@ class PolyglotHTML5ParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Webfactory\Dom\EmptyXMLStringException
+     * @expectedException Webfactory\Dom\Exception\EmptyXMLStringException
      */
     public function testParseDocumentWithEmptyString() {
         $this->parser->parseDocument('');
@@ -49,7 +49,7 @@ class PolyglotHTML5ParserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Webfactory\Dom\ParsingException
+     * @expectedException Webfactory\Dom\Exception\ParsingException
      */
     public function testParseDocumentWithFacebookButtonWithoutNamespace() {
         $data = '<html xmlns="http://www.w3.org/1999/xhtml"><body>
