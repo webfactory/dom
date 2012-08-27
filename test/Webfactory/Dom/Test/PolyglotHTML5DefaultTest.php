@@ -1,22 +1,7 @@
 <?php
+namespace Webfactory\Dom\Test;
 
-namespace Webfactory\Dom;
-
-class PolyglotHTML5ParserTest extends \PHPUnit_Framework_TestCase
-{
-    /**
-     * @var PolyglotHTML5Parser
-     */
-    protected $parser;
-
-    /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
-     */
-    protected function setUp()
-    {
-        $this->parser = new PolyglotHTML5Parser;
-    }
+class PolyglotHTML5DefaultTest extends PolyglotHTML5ParserTest {
 
     /**
      * @expectedException Webfactory\Dom\Exception\EmptyXMLStringException
@@ -28,11 +13,11 @@ class PolyglotHTML5ParserTest extends \PHPUnit_Framework_TestCase
     public function testParseDocumentWithEncodedCDataSection() {
         $data = '<script type="text/javascript" xml:space="preserve">//<![CDATA[
                     xxx
-                //]]]]></script>';
+                //]]></script>';
         $doc = $this->parser->parseDocument($data);
         $this->assertTrue($doc->documentElement !== null);
 
-        $string = $doc->saveXML();
+        $string = $this->parser->dumpDocument($doc);
         // Sicherstellen, dass CDATA nur einmal vorkommt, und nicht
         // durch das Parsen doppelt escaped wurde (unsere CDATA-
         // Section ist fuer JavaScript escaped.
@@ -93,7 +78,7 @@ class PolyglotHTML5ParserTest extends \PHPUnit_Framework_TestCase
     }
 
     protected function wrapHtmlFragment($data) {
-        return '<html xmlns:esi="http://www.edge-delivery.org/esi/1.0" xmlns="' . PolyglotHTML5Parser::XHTMLNS . '">' . $data . '</html>';
+        return '<html xmlns:esi="http://www.edge-delivery.org/esi/1.0" xmlns="http://www.w3.org/1999/xhtml">' . $data . '</html>';
     }
 
 }

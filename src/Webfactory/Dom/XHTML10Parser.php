@@ -8,7 +8,7 @@ class XHTML10Parser extends BaseParser {
 
     public function __construct() {
         if (!self::$catalogInitialized) {
-            putenv('XML_CATALOG_FILES=' . __DIR__ . '/../xml/catalog/catalog');
+            putenv('XML_CATALOG_FILES=' . __DIR__ . '/../../../catalog/catalog');
             self::$catalogInitialized = true;
         }
     }
