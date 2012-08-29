@@ -4,15 +4,6 @@ namespace Webfactory\Dom;
 
 class XHTML10Parser extends BaseParser {
 
-    static protected $catalogInitialized = false;
-
-    public function __construct() {
-        if (!self::$catalogInitialized) {
-            putenv('XML_CATALOG_FILES=' . __DIR__ . '/../../../catalog/catalog');
-            self::$catalogInitialized = true;
-        }
-    }
-
     protected function wrapFragment($fragment) {
         return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
             . $this->wrapWithRootNode($fragment);
