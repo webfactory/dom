@@ -90,7 +90,7 @@ abstract class BaseParser {
     protected function createDOMDocument() {
         $d = new \DOMDocument();
         $d->resolveExternals = true; // Externe Dateien (aus der DTD) bei der Auflösung von Entities beachten. Falls nicht, sind die Entities nicht bekannt.
-        $d->substituteEntities = true; // Entities auflösen und die Zeichen, die sie darstellen, einsetzen.
+        $d->substituteEntities = false; // Entities auflösen und die Zeichen, die sie darstellen, einsetzen.
         return $d;
     }
 
