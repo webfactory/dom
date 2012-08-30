@@ -4,11 +4,6 @@ namespace Webfactory\Dom;
 
 class XHTML10Parser extends BaseParser {
 
-    protected function wrapFragment($fragment) {
-        return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
-            . $this->wrapWithRootNode($fragment);
-    }
-
     protected function fixDump($dump) {
         /*
         * Vgl. http://mail.gnome.org/archives/xml/2011-December/msg00029.html
