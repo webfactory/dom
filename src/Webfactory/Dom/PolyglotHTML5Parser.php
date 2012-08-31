@@ -6,6 +6,10 @@ use Webfactory\Dom\BaseParser;
 
 class PolyglotHTML5Parser extends BaseParser {
 
+    protected function wrapFragment($fragmentXml) {
+        return $this->wrapWithRootNode($fragmentXml);
+    }
+
     protected function fixDump($dump) {
         // http://www.w3.org/TR/html-polyglot/#empty-elements
         static $voidElements = array(

@@ -106,18 +106,18 @@ abstract class BaseParser {
         return $unknownNamespaces;
     }
 
-    protected function wrapFragment($fragmentXml) {
-        $wrap = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
-        $wrap .= '<html';
+    protected function wrapWithRootNode($fragmentXML) {
+        $wrap = '<html';
         foreach ($this->standardNamespaces as $key => $uri) {
             $wrap .= " xmlns:$key=\"$uri\"";
         }
         $wrap .= ' xmlns="' . $this->standardNamespaces[$this->defaultNamespace] . '">';
-        $wrap .= $fragmentXml;
+        $wrap .= $fragmentXML;
         $wrap .= '</html>';
         return $wrap;
     }
 
+    abstract protected function wrapFragment($fragmentXml);
     abstract protected function fixDump($dump);
 
 }
