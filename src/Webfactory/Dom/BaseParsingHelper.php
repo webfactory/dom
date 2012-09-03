@@ -27,10 +27,10 @@ class BaseParsingHelper {
      * $this->implicitNamespaces zurückgreifen.
      */
     public function parseDocument($xml) {
-        return $this->_parseDocument($this->fixInput($xml));
+        return $this->parseSanitizedDocument($this->sanitize($xml));
     }
 
-    protected function _parseDocument($xml) {
+    protected function parseSanitizedDocument($xml) {
         if (!$xml)
             throw new EmptyXMLStringException();
 
@@ -66,17 +66,17 @@ class BaseParsingHelper {
      * gesetzten Zuordnungen.
      */
     public function parseFragment($fragmentXml, $declaredNamespaces = null) {
-        return $this->_parseFragment($this->fixInput($fragmentXml), $declaredNamespaces);
+        return $this->parseSanitizedFragment($this->sanitize($fragmentXml), $declaredNamespaces);
     }
 
-    protected function _parseFragment($fragmentXml, $declaredNamespaces) {
+    protected function parseSanitizedFragment($fragmentXml, $declaredNamespaces) {
 
         if (!$fragmentXml)
             throw new EmptyXMLStringException();
 
         $xml = $this->wrapFragment($fragmentXml, $declaredNamespaces ?: $this->implicitNamespaces);
 
-        $document = $this->_parseDocument($xml);
+        $document = $this->parseSanitizedDocument($xml);
         $document->createdFromFragment = true;
 
         return $document;
@@ -124,7 +124,7 @@ class BaseParsingHelper {
         }
 
         if ($obj instanceof \DOMNodeList || $obj instanceof \DOMNode) {
-            $d = $this->_parseDocument(
+            $d = $this->parseSanitizedDocument(
                 $this->wrapFragment('', $declaredNamespaces ?: $this->implicitNamespaces)
             ); // create empty document
 
@@ -190,6 +190,8 @@ class BaseParsingHelper {
      */
     protected function fixDump($dump) { return $dump; }
 
-    protected function fixInput($s) { return $s; }
+    protected function sanitize($s) {
+        return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', ' ', $s);
+    }
 
 }

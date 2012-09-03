@@ -7,8 +7,8 @@ use Webfactory\Dom\BaseParser;
 class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
 
     // HTML-Entities fixen als Bequemlichkeit für legacy (Case 12739)
-    protected function fixInput($xml) {
-        return mb_convert_encoding($xml, 'UTF-8', 'HTML-ENTITIES');
+    protected function sanitize($xml) {
+        return mb_convert_encoding(parent::sanitize($xml), 'UTF-8', 'HTML-ENTITIES');
     }
 
     protected function fixDump($dump) {
@@ -17,7 +17,7 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
             'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img',
             'input', 'keygen', 'link', 'meta', 'param', 'source', 'esi');
 
-        preg_match_all('_<((\w+)[^>]*)/>_', $dump, $matches, PREG_SET_ORDER);
+        preg_match_all('_<((?!\w+:)(\w+)[^>]*)/>_', $dump, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $m) {
             if (!in_array($m[2], $voidElements))

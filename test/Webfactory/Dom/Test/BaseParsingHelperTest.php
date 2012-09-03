@@ -78,7 +78,6 @@ XML;
             null, // implicit NS decls in dump
             array('' => 'urn:some-uri') // implicit on load
         );
-
     }
 
     public function testParseFragmentWithImplicitNamespaceOnDump() {
@@ -153,6 +152,16 @@ XML;
      */
     public function testParsingEmptyFragmentFails() {
         $this->parser->parseFragment('');
+    }
+
+    public function testInvalidCharactersAreTolerated() { // Case 12385
+
+        $fragment = "<root>\x0b\t\n</root>";
+
+        $clean = str_replace("\x0b", " ", $fragment);
+
+        $this->assertXmlStringEqualsXmlString($clean, $this->parser->dump($this->parser->parseDocument($fragment)));
+        $this->readDumpAssertFragment($fragment, $clean);
     }
 
 }
