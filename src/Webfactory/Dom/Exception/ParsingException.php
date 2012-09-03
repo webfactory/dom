@@ -2,7 +2,7 @@
 
 namespace Webfactory\Dom\Exception;
 
-class ParsingException extends \Exception {
+class ParsingException extends ParsingHelperException {
 
     protected $errors;
     protected $document;
@@ -26,9 +26,9 @@ class ParsingException extends \Exception {
             $message .= $errors->message . ' in ' . $errors->file . ':' . $errors->line;
         } else if (is_array($errors)) {
             foreach ($errors as $error) {
-                $message .= $this->errorToString($error, $message);
+                $message .= $this->errorToString($error, $message) . "\n";
             }
-        } else if(is_string($errors)) {
+        } else if (is_string($errors)) {
             $message .= $errors;
         }
         return $message;

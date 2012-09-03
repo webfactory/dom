@@ -1,0 +1,195 @@
+<?php
+
+namespace Webfactory\Dom;
+
+use Webfactory\Dom\Exception\EmptyXMLStringException;
+use Webfactory\Dom\Exception\ParsingException;
+
+class BaseParsingHelper {
+
+    protected $implicitNamespaces = array();
+
+    public function setImplicitNamespaces(array $ns) {
+        $this->implicitNamespaces = $ns;
+    }
+
+    public function addImplicitNamespace($prefix, $uri) {
+        $this->implicitNamespaces[$prefix] = $uri;
+    }
+
+    public function getImplicitNamespaces() { return $this->implicitNamespaces; }
+
+    /*
+     * Ein XML-Dokument ist "vollständig" im Hinblick auf die Namespaces -
+     * alle im Dokument verwendeten Namespaces und ihre Prefixe sind im
+     * Dokument deklariert. Diese Methode braucht also keine Namespace-
+     * Deklarationen übergeben bekommen und braucht auch nicht auf
+     * $this->implicitNamespaces zurückgreifen.
+     */
+    public function parseDocument($xml) {
+        return $this->_parseDocument($this->fixInput($xml));
+    }
+
+    protected function _parseDocument($xml) {
+        if (!$xml)
+            throw new EmptyXMLStringException();
+
+        $d = $this->createDOMDocument();
+
+        $errorHandling = libxml_use_internal_errors(true);
+
+        $d->loadXML($xml);
+
+        $errors = libxml_get_errors();
+        libxml_clear_errors();
+        libxml_use_internal_errors($errorHandling);
+
+        if ($d->documentElement == null || $errors)
+            throw new ParsingException($errors, $d);
+
+        return $d;
+    }
+
+    /*
+     * Bei der Verarbeitung eines Fragments ist unklar, welcher Namespace der
+     * default-Namespace (für Elemente ohne Prefix) ist. Auch kann es sein, dass
+     * Elemente im Fragment ein Namespace-Prefix tragen, dessen Deklaration aber
+     * außerhalb des Fragments liegt (was passiert, wenn wir einfach als String-Operation
+     * einen Teil aus einem XML-Dokument ausschneiden).
+     *
+     * In diesem Fall kann über $declaredNamespaces eine Liste von Prefix -> Namespace-URL
+     * übergeben werden, die bei der Verarbeitung zu Grunde zu legen ist. XML-Elemente mit
+     * Prefixen aus dieser Liste werden dann ohne Fehler importiert und den entsprechenden
+     * Namespace-URLs zugeordnet.
+     *
+     * Wird die Liste nicht übergeben, gelten die auf dem Parser als "implicitNamespaces"
+     * gesetzten Zuordnungen.
+     */
+    public function parseFragment($fragmentXml, $declaredNamespaces = null) {
+        return $this->_parseFragment($this->fixInput($fragmentXml), $declaredNamespaces);
+    }
+
+    protected function _parseFragment($fragmentXml, $declaredNamespaces) {
+
+        if (!$fragmentXml)
+            throw new EmptyXMLStringException();
+
+        $xml = $this->wrapFragment($fragmentXml, $declaredNamespaces ?: $this->implicitNamespaces);
+
+        $document = $this->_parseDocument($xml);
+        $document->createdFromFragment = true;
+
+        return $document;
+    }
+
+    protected function xmlNamespaceDeclaration($ns) {
+        if (!$ns) return '';
+
+        $s = '';
+        foreach ($ns as $prefix => $url) {
+            if ($prefix == '') $attr = "xmlns"; else $attr = "xmlns:$prefix";
+            $s .= " $attr=\"$url\"";
+        }
+        return $s;
+    }
+
+    /*
+     * Schreibt ein DOMDocument, eine DOMNodeList oder eine DOMNode
+     * zurück in einen String.
+     *
+     * Ein DOMDocument ist im Hinblick auf XML-Namespaces immer "vollständig",
+     * alle notwendigen Deklarationen sind in ihm enthalten.
+     *
+     * Bei DOMNodeList oder DOMNodes ist das anders:
+     *
+     * Wird eine Liste von $declaredNamespaces (Prefix -> URL)
+     * übergeben, so werden bei XML-Knoten mit passenden Zuordnungen
+     * die XML Namespace-Deklarationen ausgelassen (kompakter, redundanzfrei).
+     *
+     * Das setzt voraus, dass an der Stelle, an der der XML-String eingesetzt
+     * wird, die entsprechenden Namespaces deklariert sind.
+     *
+     * Wird $declaredNamespaces ausgelassen, so werden die $implicitNamespaces
+     * dieses Parsers verwendet. Es ist dann notwendig, dass sich diese Deklarationen
+     * im Ziel-XML-Dokument befinden, beispielsweise auf dem Root-Element.
+     */
+    public function dump($obj, $declaredNamespaces = null) {
+
+        if ($obj instanceof \DOMDocument) {
+            if ($obj->createdFromFragment) {
+                return $this->dump($obj->documentElement->childNodes, $declaredNamespaces);
+            } else {
+                return $this->fixDump($obj->saveXML());
+            }
+        }
+
+        if ($obj instanceof \DOMNodeList || $obj instanceof \DOMNode) {
+            $d = $this->_parseDocument(
+                $this->wrapFragment('', $declaredNamespaces ?: $this->implicitNamespaces)
+            ); // create empty document
+
+            if ($obj instanceof \DOMNodeList)
+                foreach ($obj as $node) {
+                    $d->documentElement->appendChild($d->importNode($node, true));
+                }
+            else
+                $d->documentElement->appendChild($d->importNode($obj, true));
+
+            $s = '';
+            foreach ($d->documentElement->childNodes as $node)
+                $s .= $d->saveXML($node);
+
+            return $this->fixDump($s);
+        }
+    }
+
+    /*
+     * Erzeugt eine neue DOMXPath-Instanz zur Suche im übergebenen
+     * DOMDocument. Die übergebenen Namespace-Mappings (Prefix->URL)
+     * werden auf dem XPath-Ausdruck zur Verfügung gestellt.
+     * Werden keine gesonderten Namespace-Mappings übergeben, so
+     * werden die auf diesem Parser hinterlegten $implicitNamespaces
+     * genutzt.
+     *
+     * Das ist ein bisschen Convenience und widerspricht etwas den
+     * üblichen Verwendungsmustern für einen XPath-Ausdruck:
+     * Ein Klient würde den XPath-Ausdruck erzeugen, sich überlegen,
+     * Elemente welches Namespace er treffen möchte, die Namespace-URI
+     * mit einem Prefix im XPath-Ausdruck registrieren und dann unter Verwendung dieses
+     * selbstgewählten Prefix den Ausdruck angeben. Es ist für den
+     * Klienten an der Stelle nicht relevant oder notwendig, Annahmen
+     * über die Prefixe im Dokument zu treffen oder sich auf die
+     * gleichen Prefixe zu beziehen.
+     */
+    public function createXPath(\DOMDocument $document, $namespaceMappings = null) {
+        $xpath = new \DOMXPath($document);
+
+        $ns = $namespaceMappings ?: $this->implicitNamespaces;
+
+        foreach ($ns as $prefix => $url)
+            if ($prefix)
+                $xpath->registerNamespace($prefix, $url);
+
+        return $xpath;
+    }
+
+    protected function createDOMDocument() {
+        $d = new \DOMDocument();
+        $d->resolveExternals = true; // Externe Dateien (aus der DTD) bei der Auflösung von Entities beachten. Falls nicht, sind die Entities nicht bekannt.
+        $d->substituteEntities = false; // Entities nicht expandieren
+        return $d;
+    }
+
+    protected function wrapFragment($fragment, $declaredNamespaces) {
+        return "<root {$this->xmlNamespaceDeclaration($declaredNamespaces)}>$fragment</root>";
+    }
+
+    /*
+     * Wrapper-Methode, über die Subklassen den Rückgabewert von dump()
+     * nachverarbeiten können.
+     */
+    protected function fixDump($dump) { return $dump; }
+
+    protected function fixInput($s) { return $s; }
+
+}

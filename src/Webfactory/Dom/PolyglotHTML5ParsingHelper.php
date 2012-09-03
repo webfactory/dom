@@ -4,10 +4,11 @@ namespace Webfactory\Dom;
 
 use Webfactory\Dom\BaseParser;
 
-class PolyglotHTML5Parser extends BaseParser {
+class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
 
-    protected function wrapFragment($fragmentXml) {
-        return $this->wrapWithRootNode($fragmentXml);
+    // HTML-Entities fixen als Bequemlichkeit für legacy (Case 12739)
+    protected function fixInput($xml) {
+        return mb_convert_encoding($xml, 'UTF-8', 'HTML-ENTITIES');
     }
 
     protected function fixDump($dump) {
