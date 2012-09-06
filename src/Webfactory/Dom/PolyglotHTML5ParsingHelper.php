@@ -8,7 +8,8 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
 
     // HTML-Entities fixen als Bequemlichkeit für legacy (Case 12739)
     protected function sanitize($xml) {
-        return mb_convert_encoding(parent::sanitize($xml), 'UTF-8', 'HTML-ENTITIES');
+        $escaped = str_replace(array('&amp;', '&lt;', '&gt;', '&quot;', '&apos;'), array('&amp;amp;', '&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;apos;'), $xml);
+        return html_entity_decode($escaped, ENT_QUOTES, 'UTF-8');
     }
 
     protected function fixDump($dump) {

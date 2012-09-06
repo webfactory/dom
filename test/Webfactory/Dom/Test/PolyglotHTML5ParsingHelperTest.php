@@ -18,10 +18,19 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest {
     public function testHtmlEntitiesSupportedAsConvenience() {
         // webfactory Case 12739,
         // http://dev.w3.org/html5/html-xhtml-author-guide/#named-entity-references
-        $this->readDumpAssertFragment(
-            '<p>&auml; x &ouml; x &uuml;</p>',
-            '<p>ä x ö x ü</p>'
-        );
+        /*
+            Dieser Test zeigt zwei Dinge:
+            - Named entity references wie &auml; u. �. sind in Polyglot HTML5 nicht verf�gbar. Der
+              ParsingHelper ermoeglicht es aus Bequemlichkeit und Kompatibilitaet mit "legacy"-Content 
+              (der als XHTML1 angelegt wurde), die Entitaeten beim Parsen in UTF-8 zu expandieren.
+            - Die in XML eingebauten Entitaeten lt, gt, apos und quot werden (von der libxml) selektiv
+              beibehalten, wenn es notwendig ist. In PCDATA scheint das f�r lt/gt der Fall zu sein,
+              innerhalb eines Attributs (das mit " eingeleitet wurde) ist auch das quot geschuetzt.
+        */
+        $f = $this->parser->parseFragment('<p>&auml; x &ouml; x &uuml; &quot; &lt; &gt; &apos; <x foo="&quot; &lt; &gt; &apos;"></x></p>');
+        $d = $this->parser->dump($f);
+        
+        $this->assertEquals('<p>ä x ö x ü " &lt; &gt; \' <x foo="&quot; &lt; &gt; \'"></x></p>', $d);
     }
     
 }
