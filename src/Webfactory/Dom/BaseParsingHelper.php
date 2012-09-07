@@ -31,7 +31,7 @@ class BaseParsingHelper {
     }
 
     protected function parseSanitizedDocument($xml) {
-        if (!$xml)
+		if (!$xml)
             throw new EmptyXMLStringException();
 
         $d = $this->createDOMDocument();
@@ -39,13 +39,13 @@ class BaseParsingHelper {
         $errorHandling = libxml_use_internal_errors(true);
 
         $d->loadXML($xml);
-
+		
         $errors = libxml_get_errors();
         libxml_clear_errors();
         libxml_use_internal_errors($errorHandling);
 
         if ($d->documentElement == null || $errors)
-            throw new ParsingException($errors, $d);
+            throw new ParsingException($errors, $d, $xml);
 
         return $d;
     }
