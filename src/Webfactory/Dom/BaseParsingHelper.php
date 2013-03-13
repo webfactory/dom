@@ -114,7 +114,9 @@ class BaseParsingHelper {
      * im Ziel-XML-Dokument befinden, beispielsweise auf dem Root-Element.
      */
     public function dump($obj, $declaredNamespaces = null) {
-
+        if ($obj instanceof \DOMAttr) {
+            return $obj->value;
+        }
         if ($obj instanceof \DOMDocument) {
             if ($obj->createdFromFragment) {
                 return $this->dump($obj->documentElement->childNodes, $declaredNamespaces);
