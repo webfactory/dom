@@ -4,6 +4,7 @@ namespace Webfactory\Dom;
 
 use Webfactory\Dom\Exception\EmptyXMLStringException;
 use Webfactory\Dom\Exception\ParsingException;
+use Webfactory\Dom\Exception\ParsingHelperException;
 
 class BaseParsingHelper {
 
@@ -114,9 +115,22 @@ class BaseParsingHelper {
      * im Ziel-XML-Dokument befinden, beispielsweise auf dem Root-Element.
      */
     public function dump($obj, $declaredNamespaces = null) {
+
         if ($obj instanceof \DOMAttr) {
             return $obj->value;
         }
+
+        if ($obj instanceof \DOMNodeList && $obj->item(0) instanceof \DOMAttr) {
+            $s = '';
+            foreach ($obj as $attr) {
+                if (! $attr instanceof \DOMAttr) {
+                    throw new ParsingHelperException("A DOMNodeList must contain only DOMAttr or DOMNode nodes");
+                }
+                $s .= $attr->value . ' ';
+            }
+            return trim($s);
+        }
+
         if ($obj instanceof \DOMDocument) {
             if ($obj->createdFromFragment) {
                 return $this->dump($obj->documentElement->childNodes, $declaredNamespaces);
@@ -130,16 +144,21 @@ class BaseParsingHelper {
                 $this->wrapFragment('', $declaredNamespaces ?: $this->implicitNamespaces)
             ); // create empty document
 
-            if ($obj instanceof \DOMNodeList)
+            if ($obj instanceof \DOMNodeList) {
                 foreach ($obj as $node) {
+                    if ($attr instanceof \DOMAttr) {
+                        throw new ParsingHelperException("A DOMNodeList must contain only DOMAttr or DOMNode nodes");
+                    }
                     $d->documentElement->appendChild($d->importNode($node, true));
                 }
-            else
+            } else {
                 $d->documentElement->appendChild($d->importNode($obj, true));
+            }
 
             $s = '';
-            foreach ($d->documentElement->childNodes as $node)
+            foreach ($d->documentElement->childNodes as $node) {
                 $s .= $d->saveXML($node);
+            }
 
             return $this->fixDump($s);
         }
