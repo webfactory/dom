@@ -146,7 +146,7 @@ class BaseParsingHelper {
 
             if ($obj instanceof \DOMNodeList) {
                 foreach ($obj as $node) {
-                    if ($attr instanceof \DOMAttr) {
+                    if ($node instanceof \DOMAttr) {
                         throw new ParsingHelperException("A DOMNodeList must contain only DOMAttr or DOMNode nodes");
                     }
                     $d->documentElement->appendChild($d->importNode($node, true));
