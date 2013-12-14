@@ -1,7 +1,20 @@
 {
     "name": "webfactory/dom",
 
+    "description": "Utilities for processing XHTML and Polyglot HTML5 documents with the PHP DOM extension",
+
+    "license": "MIT",
+
+    "authors": [{
+        "name": "webfactory GmbH",
+        "email": "info@webfactory.de",
+        "homepage": "http://www.webfactory.de",
+        "role": "Developer"
+    }],
+
     "autoload": {
-        "psr-0": { "Webfactory\\Dom": "src" }
+        "psr-0": {
+            "Webfactory\\Dom": "src"
+        }
     }
 }
