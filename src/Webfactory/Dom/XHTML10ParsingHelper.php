@@ -10,11 +10,18 @@ namespace Webfactory\Dom;
 
 class XHTML10ParsingHelper extends HTMLParsingHelper {
 
-    protected function wrapFragment($fragment, $declaredNamespaces) {
-        return '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">' . parent::wrapFragment($fragment, $declaredNamespaces);
+    protected function wrapFragment($fragment, $declaredNamespaces)
+    {
+        return
+            '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'
+            . parent::wrapFragment(
+                $fragment,
+                $declaredNamespaces
+            );
     }
 
-    protected function fixDump($dump) {
+    protected function fixDump($dump)
+    {
         /*
         * Vgl. http://mail.gnome.org/archives/xml/2011-December/msg00029.html
         * Die libxml2 erkennt XHTML-Dokumente und gibt in diesem Fall nur die in der

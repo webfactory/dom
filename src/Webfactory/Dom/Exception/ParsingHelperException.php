@@ -8,4 +8,5 @@
 
 namespace Webfactory\Dom\Exception;
 
-class ParsingHelperException extends \Exception {}
+class ParsingHelperException extends \Exception {
+}

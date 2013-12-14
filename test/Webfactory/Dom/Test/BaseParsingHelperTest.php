@@ -4,11 +4,13 @@ namespace Webfactory\Dom\Test;
 
 class BaseParsingHelperTest extends ParsingHelperTest {
 
-    protected function createParsingHelper() {
+    protected function createParsingHelper()
+    {
         return new \Webfactory\Dom\BaseParsingHelper();
     }
 
-    public function testEntireDocumentIsPreserved() {
+    public function testEntireDocumentIsPreserved()
+    {
         /* Ein gesamtes Dokument, mit default-Namespace und NS-Deklarationen in unterschiedlichen Scopes */
         $entireDocument = <<<XML
 <?xml version="1.0"?>
@@ -28,7 +30,8 @@ XML;
         $this->assertXmlStringEqualsXmlString($entireDocument, $this->parser->dump($document));
     }
 
-    public function testParseFragment() {
+    public function testParseFragment()
+    {
         // Unterschiedliche Fragmente mit verschiedenen NS-Deklarationen
         $this->readDumpAssertFragment('<tag>Foo</tag>');
         $this->readDumpAssertFragment('<foo:tag xmlns:foo="urn:test">Foo</foo:tag>');
@@ -39,23 +42,27 @@ XML;
     /**
      * @expectedException \Webfactory\Dom\Exception\ParsingException
      */
-    public function testParseFragmentWithUnknownNamespaceDecl() {
+    public function testParseFragmentWithUnknownNamespaceDecl()
+    {
         $this->readDumpAssertFragment('<foo:tag>xxx</foo:tag>');
     }
 
     /**
      * @expectedException \Webfactory\Dom\Exception\ParsingException
      */
-    public function testParseDocumentWithUnknownNamespaceDecl() {
+    public function testParseDocumentWithUnknownNamespaceDecl()
+    {
         $document = $this->parser->parseDocument('<root><foo:fail>failme</foo:fail></root>');
     }
 
-    public function testParseFragmentWithImplicitNamespaceDecl() {
+    public function testParseFragmentWithImplicitNamespaceDecl()
+    {
         $this->parser->addImplicitNamespace('foo', 'urn:some-namespace-uri');
         $this->readDumpAssertFragment('<foo:tag>xxx</foo:tag>');
     }
 
-    public function testParseFragmentImplicitNamespaceOnLoadIsAddedOnDump() {
+    public function testParseFragmentImplicitNamespaceOnLoadIsAddedOnDump()
+    {
         $this->readDumpAssertFragment(
             '<foo:tag>xxx</foo:tag>',
             '<foo:tag xmlns:foo="urn:some-namespace-uri">xxx</foo:tag>',
@@ -80,7 +87,8 @@ XML;
         );
     }
 
-    public function testParseFragmentWithImplicitNamespaceOnDump() {
+    public function testParseFragmentWithImplicitNamespaceOnDump()
+    {
         // Wenn der Namespace schon deklariert ist, entfällt die erneute Angabe
         $this->readDumpAssertFragment(
             '<foo:tag xmlns:foo="urn:some-namespace-uri">xxx</foo:tag>',
@@ -90,12 +98,14 @@ XML;
         );
     }
 
-    public function testImplicitNamespaceDeclDoesNotInterfereWithFragment() {
+    public function testImplicitNamespaceDeclDoesNotInterfereWithFragment()
+    {
         $this->parser->addImplicitNamespace('foo', 'urn:some-namespace-uri');
         $this->readDumpAssertFragment('<foo:tag xmlns:foo="urn:some-other-uri">xxx</foo:tag>');
     }
 
-    public function testImplicitNamespaceDeclOnDumpMismatchesFragment() {
+    public function testImplicitNamespaceDeclOnDumpMismatchesFragment()
+    {
         $this->readDumpAssertFragment(
             '<foo:tag xmlns:foo="urn:some-namespace-uri">xxx</foo:tag>',
             null, // same as loaded
@@ -110,31 +120,37 @@ XML;
         );
     }
 
-
-    public function testImplicitNamespaceDeclDoesNotChangePrefix() {
+    public function testImplicitNamespaceDeclDoesNotChangePrefix()
+    {
         // Eine Deklaration über ein anderes Prefix ändert nichts - Prefixe werden nicht umgeschrieben
         $this->readDumpAssertFragment(
             '<foo:tag xmlns:foo="urn:some-uri">xxx</foo:tag>',
             null,
             array('bar' => 'urn:some-uri')
         );
-
     }
 
-    public function testPartialDumpCarriesOverNamespaceDeclaration() {
+    public function testPartialDumpCarriesOverNamespaceDeclaration()
+    {
         $document = $this->parser->parseDocument('<root xmlns="urn:test"><foo>test</foo></root>');
-        $this->assertEquals('<foo xmlns="urn:test">test</foo>', $this->parser->dump($document->documentElement->childNodes->item(0)));
+        $this->assertEquals(
+            '<foo xmlns="urn:test">test</foo>',
+            $this->parser->dump($document->documentElement->childNodes->item(0))
+        );
     }
 
-    public function testXPathExpressionAndNodeListDump() {
+    public function testXPathExpressionAndNodeListDump()
+    {
         $this->parser->addImplicitNamespace('foo', 'urn:some-uri');
-        $f = $this->parser->parseFragment('
-            <foo:bar>test1</foo:bar>
-            <bar>
-                This is the bar tag outside any NS, not a {urn:some-uri}bar tag.
-                <foo:bar>test2</foo:bar>
-            </bar>
-        ');
+        $f = $this->parser->parseFragment(
+            '
+                        <foo:bar>test1</foo:bar>
+                        <bar>
+                            This is the bar tag outside any NS, not a {urn:some-uri}bar tag.
+                            <foo:bar>test2</foo:bar>
+                        </bar>
+                    '
+        );
         $xp = $this->parser->createXPath($f);
         $res = $xp->query('//foo:bar', $f);
         $this->assertEquals('<foo:bar>test1</foo:bar><foo:bar>test2</foo:bar>', $this->parser->dump($res));
@@ -143,18 +159,21 @@ XML;
     /**
      * @expectedException Webfactory\Dom\Exception\EmptyXMLStringException
      */
-    public function testParsingEmptyDocumentFails() {
+    public function testParsingEmptyDocumentFails()
+    {
         $this->parser->parseDocument('');
     }
 
     /**
      * @expectedException Webfactory\Dom\Exception\EmptyXMLStringException
      */
-    public function testParsingEmptyFragmentFails() {
+    public function testParsingEmptyFragmentFails()
+    {
         $this->parser->parseFragment('');
     }
 
-    public function testInvalidCharactersAreTolerated() { // Case 12385
+    public function testInvalidCharactersAreTolerated()
+    { // Case 12385
 
         $fragment = "<root>\x0b\t\n</root>";
 
@@ -163,5 +182,4 @@ XML;
         $this->assertXmlStringEqualsXmlString($clean, $this->parser->dump($this->parser->parseDocument($fragment)));
         $this->readDumpAssertFragment($fragment, $clean);
     }
-
 }

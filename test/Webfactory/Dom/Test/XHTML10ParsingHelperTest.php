@@ -3,11 +3,13 @@ namespace Webfactory\Dom\Test;
 
 class XHTML10ParsingHelperTest extends HTMLParsingHelperTest {
 
-    protected function createParsingHelper() {
+    protected function createParsingHelper()
+    {
         return new \Webfactory\Dom\XHTML10ParsingHelper();
     }
 
-    public function testEntireDocumentIsPreserved() {
+    public function testEntireDocumentIsPreserved()
+    {
         $entireDocument = <<<XML
 <?xml version="1.0"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -30,7 +32,8 @@ XML;
         $this->assertXmlStringEqualsXmlString($entireDocument, $this->parser->dump($document));
     }
 
-    public function testIncompleteDocumentIsFixed() {
+    public function testIncompleteDocumentIsFixed()
+    {
         $missingNSDecl = <<<XML
 <?xml version="1.0"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -47,7 +50,8 @@ XML;
         $this->assertEquals($fixedNsDecl, trim($this->parser->dump($document)));
     }
 
-    public function testVoidTagsArePreservedWhileEmptyTagsAreExpanded() {
+    public function testVoidTagsArePreservedWhileEmptyTagsAreExpanded()
+    {
         $this->readDumpAssertFragment(
             '<area/><base/><br/><col/><hr/><img/><input/><link/><meta/><param/>',
             '<area shape="rect" /><base /><br /><col span="1" /><hr /><img /><input type="text" /><link /><meta /><param valuetype="data" />'
@@ -55,5 +59,4 @@ XML;
 
         $this->readDumpAssertFragment('<p/>', '<p></p>');
     }
-
 }

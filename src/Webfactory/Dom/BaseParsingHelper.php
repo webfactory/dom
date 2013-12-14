@@ -16,15 +16,20 @@ class BaseParsingHelper {
 
     protected $implicitNamespaces = array();
 
-    public function setImplicitNamespaces(array $ns) {
+    public function setImplicitNamespaces(array $ns)
+    {
         $this->implicitNamespaces = $ns;
     }
 
-    public function addImplicitNamespace($prefix, $uri) {
+    public function addImplicitNamespace($prefix, $uri)
+    {
         $this->implicitNamespaces[$prefix] = $uri;
     }
 
-    public function getImplicitNamespaces() { return $this->implicitNamespaces; }
+    public function getImplicitNamespaces()
+    {
+        return $this->implicitNamespaces;
+    }
 
     /*
      * Ein XML-Dokument ist "vollständig" im Hinblick auf die Namespaces -
@@ -33,26 +38,30 @@ class BaseParsingHelper {
      * Deklarationen übergeben bekommen und braucht auch nicht auf
      * $this->implicitNamespaces zurückgreifen.
      */
-    public function parseDocument($xml) {
+    public function parseDocument($xml)
+    {
         return $this->parseSanitizedDocument($this->sanitize($xml));
     }
 
-    protected function parseSanitizedDocument($xml) {
-		if (!$xml)
+    protected function parseSanitizedDocument($xml)
+    {
+        if (!$xml) {
             throw new EmptyXMLStringException();
+        }
 
         $d = $this->createDOMDocument();
 
         $errorHandling = libxml_use_internal_errors(true);
 
         $d->loadXML($xml);
-		
+
         $errors = libxml_get_errors();
         libxml_clear_errors();
         libxml_use_internal_errors($errorHandling);
 
-        if ($d->documentElement == null || $errors)
+        if ($d->documentElement == null || $errors) {
             throw new ParsingException($errors, $d, $xml);
+        }
 
         return $d;
     }
@@ -72,16 +81,19 @@ class BaseParsingHelper {
      * Wird die Liste nicht übergeben, gelten die auf dem Parser als "implicitNamespaces"
      * gesetzten Zuordnungen.
      */
-    public function parseFragment($fragmentXml, $declaredNamespaces = null) {
+    public function parseFragment($fragmentXml, $declaredNamespaces = null)
+    {
         return $this->parseSanitizedFragment($this->sanitize($fragmentXml), $declaredNamespaces);
     }
 
-    protected function parseSanitizedFragment($fragmentXml, $declaredNamespaces) {
+    protected function parseSanitizedFragment($fragmentXml, $declaredNamespaces)
+    {
 
-        if (!$fragmentXml)
+        if (!$fragmentXml) {
             throw new EmptyXMLStringException();
+        }
 
-        $xml = $this->wrapFragment($fragmentXml, $declaredNamespaces ?: $this->implicitNamespaces);
+        $xml = $this->wrapFragment($fragmentXml, $declaredNamespaces ? : $this->implicitNamespaces);
 
         $document = $this->parseSanitizedDocument($xml);
         $document->createdFromFragment = true;
@@ -89,12 +101,19 @@ class BaseParsingHelper {
         return $document;
     }
 
-    protected function xmlNamespaceDeclaration($ns) {
-        if (!$ns) return '';
+    protected function xmlNamespaceDeclaration($ns)
+    {
+        if (!$ns) {
+            return '';
+        }
 
         $s = '';
         foreach ($ns as $prefix => $url) {
-            if ($prefix == '') $attr = "xmlns"; else $attr = "xmlns:$prefix";
+            if ($prefix == '') {
+                $attr = "xmlns";
+            } else {
+                $attr = "xmlns:$prefix";
+            }
             $s .= " $attr=\"$url\"";
         }
         return $s;
@@ -120,7 +139,8 @@ class BaseParsingHelper {
      * dieses Parsers verwendet. Es ist dann notwendig, dass sich diese Deklarationen
      * im Ziel-XML-Dokument befinden, beispielsweise auf dem Root-Element.
      */
-    public function dump($obj, $declaredNamespaces = null) {
+    public function dump($obj, $declaredNamespaces = null)
+    {
 
         if ($obj instanceof \DOMAttr) {
             return $obj->value;
@@ -129,7 +149,7 @@ class BaseParsingHelper {
         if ($obj instanceof \DOMNodeList && $obj->item(0) instanceof \DOMAttr) {
             $s = '';
             foreach ($obj as $attr) {
-                if (! $attr instanceof \DOMAttr) {
+                if (!$attr instanceof \DOMAttr) {
                     throw new ParsingHelperException("A DOMNodeList must contain only DOMAttr or DOMNode nodes");
                 }
                 $s .= $attr->value . ' ';
@@ -147,7 +167,7 @@ class BaseParsingHelper {
 
         if ($obj instanceof \DOMNodeList || $obj instanceof \DOMNode) {
             $d = $this->parseSanitizedDocument(
-                $this->wrapFragment('', $declaredNamespaces ?: $this->implicitNamespaces)
+                $this->wrapFragment('', $declaredNamespaces ? : $this->implicitNamespaces)
             ); // create empty document
 
             if ($obj instanceof \DOMNodeList) {
@@ -188,26 +208,31 @@ class BaseParsingHelper {
      * über die Prefixe im Dokument zu treffen oder sich auf die
      * gleichen Prefixe zu beziehen.
      */
-    public function createXPath(\DOMDocument $document, $namespaceMappings = null) {
+    public function createXPath(\DOMDocument $document, $namespaceMappings = null)
+    {
         $xpath = new \DOMXPath($document);
 
-        $ns = $namespaceMappings ?: $this->implicitNamespaces;
+        $ns = $namespaceMappings ? : $this->implicitNamespaces;
 
-        foreach ($ns as $prefix => $url)
-            if ($prefix)
+        foreach ($ns as $prefix => $url) {
+            if ($prefix) {
                 $xpath->registerNamespace($prefix, $url);
+            }
+        }
 
         return $xpath;
     }
 
-    protected function createDOMDocument() {
+    protected function createDOMDocument()
+    {
         $d = new \DOMDocument();
         $d->resolveExternals = true; // Externe Dateien (aus der DTD) bei der Auflösung von Entities beachten. Falls nicht, sind die Entities nicht bekannt.
         $d->substituteEntities = false; // Entities nicht expandieren
         return $d;
     }
 
-    protected function wrapFragment($fragment, $declaredNamespaces) {
+    protected function wrapFragment($fragment, $declaredNamespaces)
+    {
         return "<root {$this->xmlNamespaceDeclaration($declaredNamespaces)}>$fragment</root>";
     }
 
@@ -215,10 +240,13 @@ class BaseParsingHelper {
      * Wrapper-Methode, über die Subklassen den Rückgabewert von dump()
      * nachverarbeiten können.
      */
-    protected function fixDump($dump) { return $dump; }
-
-    protected function sanitize($s) {
-        return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', ' ', $s);
+    protected function fixDump($dump)
+    {
+        return $dump;
     }
 
+    protected function sanitize($s)
+    {
+        return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', ' ', $s);
+    }
 }
