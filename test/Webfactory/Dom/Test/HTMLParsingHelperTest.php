@@ -25,4 +25,9 @@ abstract class HTMLParsingHelperTest extends ParsingHelperTest {
     {
         $this->readDumpAssertFragment('<p>Test <esi:include foo="bar"/></p>');
     }
+
+    public function testEsiTagWithXMLSpecialCharsIsPreserved()
+    {
+        $this->readDumpAssertFragment('<p>Test <esi:include foo="http://foo.bar?one=two&three=four"/></p>');
+    }
 }

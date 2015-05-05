@@ -236,17 +236,14 @@ class BaseParsingHelper {
         return "<root {$this->xmlNamespaceDeclaration($declaredNamespaces)}>$fragment</root>";
     }
 
-    /*
-     * Wrapper-Methode, über die Subklassen den Rückgabewert von dump()
-     * nachverarbeiten können.
-     */
     protected function fixDump($dump)
     {
-        return $dump;
+        return preg_replace('_\<\!\[CDATA\[(<esi:[^>]+>)\]\]>_', '$1', $dump);
     }
 
     protected function sanitize($s)
     {
+        $s = preg_replace('_<esi:[^>]+>_', '<![CDATA[$0]]>', $s); // escape <esi:...> placeholders
         return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', ' ', $s);
     }
 }
