@@ -15,6 +15,8 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
     // HTML-Entities fixen als Bequemlichkeit für legacy (Case 12739)
     protected function sanitize($xml)
     {
+        $xml = parent::sanitize($xml);
+
         $escaped = str_replace(
             array('&amp;', '&lt;', '&gt;', '&quot;', '&apos;'),
             array('&amp;amp;', '&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;apos;'),
@@ -25,6 +27,8 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
 
     protected function fixDump($dump)
     {
+        $dump = parent::fixDump($dump);
+
         // http://www.w3.org/TR/html-polyglot/#empty-elements
         static $voidElements = array(
             'area',
@@ -40,8 +44,7 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
             'link',
             'meta',
             'param',
-            'source',
-            'esi'
+            'source'
         );
 
         preg_match_all('_<((?!\w+:)(\w+)[^>]*)/>_', $dump, $matches, PREG_SET_ORDER);
