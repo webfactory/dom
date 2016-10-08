@@ -45,6 +45,38 @@ XML;
         $this->readDumpAssertFragment('<tag xmlns="urn:test">Foo</tag>');
     }
 
+    public function testDefaultNamespaceOnInnerElementIsNotPrefixed()
+    {
+        $this->markTestSkipped('Pending bugs in PHP: https://bugs.php.net/bug.php?id=47530, https://bugs.php.net/bug.php?id=55294');
+
+        /*
+         * In this example, "tag" is from the "urn:first" namespace and "inner" is from "urn:second".
+         *
+         * One could expect that parsing and re-serializing this fragment does not need to change the resulting
+         * XML at all. However, some internals in libxml try to merge namespace declarations on common ancestor nodes
+         * and lead to the declaration of "default" and "default1" namespace prefixes on the "outer" element;
+         * <tag> and <inner> are rewritten to <default:tag> and <default1:inner>.
+         * Note that this has nothing to do with the default namespace; it's something internal to libxml.
+         *
+         *      From xmlNewReconciliedNs in libxml's tree.c:
+         *             This function tries to locate a namespace definition in a tree
+         *             ancestors, or create a new namespace definition node similar to
+         *             @ns trying to reuse the same prefix. However if the given prefix is
+         *             null (default namespace) or reused within the subtree defined by
+         *             @tree or on one of its ancestors then a new prefix is generated.
+         *             Returns the (new) namespace definition or NULL in case of error
+         *
+         * Now, technically, this does not make a difference as the elements are still associated with the
+         * original namespace. However, it does make a difference when embedding <svg> in HTML, for example,
+         * when User Agents are not using a XML parser and do not honor the namespace declarations.
+         *
+         * In this case,
+         * http://stackoverflow.com/questions/18467982/are-svg-parameters-such-as-xmlns-and-version-needed
+         * suggests to simply omit the xmlns declaration for the <svg> element.
+         */
+        $this->readDumpAssertFragment('<outer><tag xmlns="urn:first"><inner xmlns="urn:second"></inner></tag></outer>');
+    }
+
     /**
      * @expectedException \Webfactory\Dom\Exception\ParsingException
      */
@@ -163,7 +195,7 @@ XML;
     }
 
     /**
-     * @expectedException Webfactory\Dom\Exception\EmptyXMLStringException
+     * @expectedException \Webfactory\Dom\Exception\EmptyXMLStringException
      */
     public function testParsingEmptyDocumentFails()
     {
@@ -171,7 +203,7 @@ XML;
     }
 
     /**
-     * @expectedException Webfactory\Dom\Exception\EmptyXMLStringException
+     * @expectedException \Webfactory\Dom\Exception\EmptyXMLStringException
      */
     public function testParsingEmptyFragmentFails()
     {
