@@ -88,7 +88,6 @@ class BaseParsingHelper {
 
     protected function parseSanitizedFragment($fragmentXml, $declaredNamespaces)
     {
-
         if (!$fragmentXml) {
             throw new EmptyXMLStringException();
         }
@@ -158,7 +157,7 @@ class BaseParsingHelper {
         }
 
         if ($obj instanceof \DOMDocument) {
-            if ($obj->createdFromFragment) {
+            if ($obj instanceof Document && $obj->createdFromFragment) {
                 return $this->dump($obj->documentElement->childNodes, $declaredNamespaces);
             } else {
                 return $this->fixDump($obj->saveXML());
@@ -225,7 +224,7 @@ class BaseParsingHelper {
 
     protected function createDOMDocument()
     {
-        $d = new \DOMDocument();
+        $d = new Document();
         $d->resolveExternals = true; // Externe Dateien (aus der DTD) bei der Auflösung von Entities beachten. Falls nicht, sind die Entities nicht bekannt.
         $d->substituteEntities = false; // Entities nicht expandieren
         return $d;
