@@ -1,5 +1,0 @@
-syntax:regexp
-^lib/
-^vendor/
-^composer.lock
-^phpunit.xml$
