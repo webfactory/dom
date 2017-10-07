@@ -237,7 +237,7 @@ class BaseParsingHelper {
 
     protected function fixDump($dump)
     {
-        return preg_replace('_\<\!\[CDATA\[(<esi:[^>]+>)\]\]>_', '$1', $dump);
+        return preg_replace('_\<\!\[CDATA\[((?:<esi:[^>]+>)+)\]\]>_', '$1', $dump);
     }
 
     protected function sanitize($s)
