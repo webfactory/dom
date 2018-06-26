@@ -17,6 +17,8 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
     {
         $xml = parent::sanitize($xml);
 
+        $xml = str_replace('xmlns="http://www.w3.org/2000/svg"', '_xmlns="http://www.w3.org/2000/svg"', $xml);
+
         $escaped = str_replace(
             array('&amp;', '&lt;', '&gt;', '&quot;', '&apos;'),
             array('&amp;amp;', '&amp;lt;', '&amp;gt;', '&amp;quot;', '&amp;apos;'),
@@ -54,6 +56,8 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
                 $dump = str_replace($m[0], "<{$m[1]}></{$m[2]}>", $dump);
             }
         }
+
+        $dump = str_replace('_xmlns="http://www.w3.org/2000/svg"', 'xmlns="http://www.w3.org/2000/svg"', $dump);
 
         return $dump;
     }
