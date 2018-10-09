@@ -24,6 +24,8 @@ class XHTML10ParsingHelper extends HTMLParsingHelper
                         return $catalogDir . 'xhtml-symbol.ent';
                     case '-//W3C//ENTITIES Special for XHTML//EN':
                         return $catalogDir . 'xhtml-special.ent';
+                    case '-//W3C//DTD XHTML 1.0 Transitional//EN':
+                        return $catalogDir . 'xhtml1-transitional.dtd';
                 }
             }
 
