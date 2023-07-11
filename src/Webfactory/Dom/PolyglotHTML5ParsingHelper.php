@@ -64,4 +64,9 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
 
         return $dump;
     }
+
+    protected function wrapFragment($fragment, $declaredNamespaces)
+    {
+        return "<html>$fragment</html>";
+    }
 }
