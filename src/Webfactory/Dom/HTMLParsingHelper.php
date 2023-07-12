@@ -10,14 +10,12 @@ namespace Webfactory\Dom;
 
 abstract class HTMLParsingHelper extends BaseParsingHelper {
 
-    protected $implicitNamespaces = array(
-        'html' => 'http://www.w3.org/1999/xhtml', // für XPath
-        ''     => 'http://www.w3.org/1999/xhtml', // default ns
-        'hx'   => 'http://purl.org/NET/hinclude' // fuer HInclude http://mnot.github.io/hinclude/; ein Weg um z.B. Controller in Symfony per Ajax zu embedden
-    );
+    protected $implicitNamespaces;
 
     public function __construct()
     {
+        $this->implicitNamespaces = $this->defineImplicitNamespaces();
+
         libxml_set_external_entity_loader(function ($public, $system, $context) {
             if (isset($public)) {
                 $catalogDir = __DIR__ . '/../../../xml-catalog/';
@@ -42,5 +40,22 @@ abstract class HTMLParsingHelper extends BaseParsingHelper {
     protected function wrapFragment($fragment, $declaredNamespaces)
     {
         return "<html {$this->xmlNamespaceDeclaration($declaredNamespaces)}>$fragment</html>";
+    }
+
+    protected function defineImplicitNamespaces(): array
+    {
+        if(phpversion('xml') >= '8.1.21') {
+            return [
+                'html' => 'http://www.w3.org/1999/xhtml', // für XPath
+                ''     => 'http://www.w3.org/1999/xhtml', // default ns
+                'hx'   => 'http://purl.org/NET/hinclude' // fuer HInclude http://mnot.github.io/hinclude/; ein Weg um z.B. Controller in Symfony per Ajax zu embedden
+            ];
+        }
+
+        return [
+            ''     => 'http://www.w3.org/1999/xhtml', // default ns
+            'html' => 'http://www.w3.org/1999/xhtml', // für XPath
+            'hx'   => 'http://purl.org/NET/hinclude' // fuer HInclude http://mnot.github.io/hinclude/; ein Weg um z.B. Controller in Symfony per Ajax zu embedden
+        ];
     }
 }
