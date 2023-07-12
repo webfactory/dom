@@ -58,7 +58,7 @@ abstract class HTMLParsingHelper extends BaseParsingHelper {
          * - https://github.com/php/php-src/commit/b30be40b86b62fc681c432fd96840d8e57e172a5 (https://bugs.php.net/bug.php?id=55294)
          *
          * but it perfectly matches our observation that changing the namespace order fixes several bugs and tests
-         * in various private projects.
+         * in various private projects of ours.
          */
         if (phpversion('xml') >= '8.1.21') {
             return [
