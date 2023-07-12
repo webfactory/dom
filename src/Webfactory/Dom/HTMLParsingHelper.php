@@ -51,7 +51,7 @@ abstract class HTMLParsingHelper extends BaseParsingHelper {
          * getting a wrong prefix while being appended to another element using `appendChild()` e.g. in
          * `BaseParsingHelper::dump()`.
          *
-         * This is definitely a supposition, as we do not get everything completely what happens in the correspondig
+         * This is definitely a supposition, as we do not get everything completely what happens in the corresponding
          * commits
          *
          * - https://github.com/php/php-src/commit/b1d8e240e688cae810c83b364772bf140ac45f42 (https://bugs.php.net/bug.php?id=67440)
