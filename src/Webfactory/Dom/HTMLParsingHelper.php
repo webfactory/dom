@@ -48,8 +48,8 @@ abstract class HTMLParsingHelper extends BaseParsingHelper {
          * The Update to PHP 8.1.21 apparently changes the search order for defined namespaces during the process
          * of reconciliation, resulting in finding the namespace having the prefix 'html' prior to the default one
          * without prefix, as the search seems to start from the last defined prefix now. This results in DOMElements
-         * getting a wrong prefix while being appended to another element using `appendChild()`,
-         * e.g in `BaseParsingHelper::dump()`.
+         * getting a wrong prefix while being appended to another element using `appendChild()` e.g. in
+         * `BaseParsingHelper::dump()`.
          *
          * This is definitely a supposition, as we do not get everything completely what happens in the correspondig
          * commits
