@@ -44,7 +44,7 @@ abstract class HTMLParsingHelper extends BaseParsingHelper {
 
     protected function defineImplicitNamespaces(): array
     {
-        if(phpversion('xml') >= '8.1.21') {
+        if (phpversion('xml') >= '8.1.21') {
             return [
                 'html' => 'http://www.w3.org/1999/xhtml', // für XPath
                 ''     => 'http://www.w3.org/1999/xhtml', // default ns
