@@ -44,6 +44,22 @@ abstract class HTMLParsingHelper extends BaseParsingHelper {
 
     protected function defineImplicitNamespaces(): array
     {
+        /**
+         * The Update to PHP 8.1.21 apparently changed the search order for defined namespaces during the process
+         * of reconciliation, resulting in finding the namespace having the prefix 'html' prior to the default one
+         * without prefix, as the search seems to start from the last defined prefix now. This results in DOMElements
+         * getting a wrong prefix while being appended to another element using `appendChild()`,
+         * e.g in `BaseParsingHelper::dump()`.
+         *
+         * This is definitely a supposition, as we do not get everything completely what happens in the correspondig
+         * commits
+         *
+         * - https://github.com/php/php-src/commit/b1d8e240e688cae810c83b364772bf140ac45f42 (https://bugs.php.net/bug.php?id=67440)
+         * - https://github.com/php/php-src/commit/b30be40b86b62fc681c432fd96840d8e57e172a5 (https://bugs.php.net/bug.php?id=55294)
+         *
+         * but it perfectly matches our observation that changing the namespace order fixes several bugs and tests
+         * in various private projects.
+         */
         if (phpversion('xml') >= '8.1.21') {
             return [
                 'html' => 'http://www.w3.org/1999/xhtml', // für XPath
