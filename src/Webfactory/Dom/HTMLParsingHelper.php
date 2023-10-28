@@ -60,7 +60,7 @@ abstract class HTMLParsingHelper extends BaseParsingHelper {
          * but it perfectly matches our observation that changing the namespace order fixes several bugs and tests
          * in various private projects of ours.
          */
-        if (phpversion('xml') >= '8.1.21') {
+        if ((phpversion('xml') >= '8.1.21') && (phpversion('xml') < '8.1.25')){
             return [
                 'html' => 'http://www.w3.org/1999/xhtml', // für XPath
                 ''     => 'http://www.w3.org/1999/xhtml', // default ns
