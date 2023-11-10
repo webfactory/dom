@@ -8,14 +8,16 @@
 
 namespace Webfactory\Dom\Test;
 
-abstract class ParsingHelperTest extends \PHPUnit_Framework_TestCase {
+use PHPUnit\Framework\TestCase;
 
+abstract class ParsingHelperTest extends TestCase
+{
     /** @var \Webfactory\Dom\BaseParsingHelper */
     protected $parser;
 
     abstract protected function createParsingHelper();
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parser = $this->createParsingHelper();
     }

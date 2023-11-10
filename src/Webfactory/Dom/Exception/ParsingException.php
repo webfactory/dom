@@ -8,7 +8,8 @@
 
 namespace Webfactory\Dom\Exception;
 
-class ParsingException extends ParsingHelperException {
+class ParsingException extends ParsingHelperException
+{
     protected $errors;
     protected $document;
     protected $xmlInput;
@@ -23,14 +24,14 @@ class ParsingException extends ParsingHelperException {
 
     protected function errorsToString($errors)
     {
-        if (!is_array($errors)) {
-            $errors = array($errors);
+        if (!\is_array($errors)) {
+            $errors = [$errors];
         }
         $message = '';
         foreach ($errors as $error) {
             if ($error instanceof \LibXMLError) {
-                $message .= $error->message . ' in line ' . $error->line;
-            } elseif (is_string($error)) {
+                $message .= $error->message.' in line '.$error->line;
+            } elseif (\is_string($error)) {
                 $message .= $error;
             }
             $message .= "\n";

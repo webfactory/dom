@@ -8,14 +8,17 @@
 
 namespace Webfactory\Dom\Test;
 
-class XHTML10ParsingHelperTest extends HTMLParsingHelperTest {
-
+class XHTML10ParsingHelperTest extends HTMLParsingHelperTest
+{
     protected function createParsingHelper()
     {
         return new \Webfactory\Dom\XHTML10ParsingHelper();
     }
 
-    public function testEntireDocumentIsPreserved()
+    /**
+     * @test
+     */
+    public function entireDocumentIsPreserved()
     {
         $entireDocument = <<<XML
 <?xml version="1.0"?>
@@ -39,7 +42,10 @@ XML;
         $this->assertXmlStringEqualsXmlString($entireDocument, $this->parser->dump($document));
     }
 
-    public function testIncompleteDocumentIsFixed()
+    /**
+     * @test
+     */
+    public function incompleteDocumentIsFixed()
     {
         $missingNSDecl = <<<XML
 <?xml version="1.0"?>
@@ -57,7 +63,10 @@ XML;
         $this->assertEquals($fixedNsDecl, trim($this->parser->dump($document)));
     }
 
-    public function testVoidTagsArePreservedWhileEmptyTagsAreExpanded()
+    /**
+     * @test
+     */
+    public function voidTagsArePreservedWhileEmptyTagsAreExpanded()
     {
         $this->readDumpAssertFragment(
             '<area/><base/><br/><col/><hr/><img/><input/><link/><meta/><param/>',

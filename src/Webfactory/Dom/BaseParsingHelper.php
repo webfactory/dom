@@ -12,9 +12,9 @@ use Webfactory\Dom\Exception\EmptyXMLStringException;
 use Webfactory\Dom\Exception\ParsingException;
 use Webfactory\Dom\Exception\ParsingHelperException;
 
-class BaseParsingHelper {
-
-    protected $implicitNamespaces = array();
+class BaseParsingHelper
+{
+    protected $implicitNamespaces = [];
 
     public function setImplicitNamespaces(array $ns)
     {
@@ -59,7 +59,7 @@ class BaseParsingHelper {
         libxml_clear_errors();
         libxml_use_internal_errors($errorHandling);
 
-        if ($d->documentElement == null || $errors) {
+        if (null == $d->documentElement || $errors) {
             throw new ParsingException($errors, $d, $xml);
         }
 
@@ -92,7 +92,7 @@ class BaseParsingHelper {
             throw new EmptyXMLStringException();
         }
 
-        $xml = $this->wrapFragment($fragmentXml, $declaredNamespaces ? : $this->implicitNamespaces);
+        $xml = $this->wrapFragment($fragmentXml, $declaredNamespaces ?: $this->implicitNamespaces);
 
         $document = $this->parseSanitizedDocument($xml);
         $document->createdFromFragment = true;
@@ -108,13 +108,14 @@ class BaseParsingHelper {
 
         $s = '';
         foreach ($ns as $prefix => $url) {
-            if ($prefix == '') {
-                $attr = "xmlns";
+            if ('' == $prefix) {
+                $attr = 'xmlns';
             } else {
                 $attr = "xmlns:$prefix";
             }
             $s .= " $attr=\"$url\"";
         }
+
         return $s;
     }
 
@@ -140,7 +141,6 @@ class BaseParsingHelper {
      */
     public function dump($obj, $declaredNamespaces = null)
     {
-
         if ($obj instanceof \DOMAttr) {
             return $obj->value;
         }
@@ -149,10 +149,11 @@ class BaseParsingHelper {
             $s = '';
             foreach ($obj as $attr) {
                 if (!$attr instanceof \DOMAttr) {
-                    throw new ParsingHelperException("A DOMNodeList must contain only DOMAttr or DOMNode nodes");
+                    throw new ParsingHelperException('A DOMNodeList must contain only DOMAttr or DOMNode nodes');
                 }
-                $s .= $attr->value . ' ';
+                $s .= $attr->value.' ';
             }
+
             return trim($s);
         }
 
@@ -166,13 +167,13 @@ class BaseParsingHelper {
 
         if ($obj instanceof \DOMNodeList || $obj instanceof \DOMNode) {
             $d = $this->parseSanitizedDocument(
-                $this->wrapFragment('', $declaredNamespaces ? : $this->implicitNamespaces)
+                $this->wrapFragment('', $declaredNamespaces ?: $this->implicitNamespaces)
             ); // create empty document
 
             if ($obj instanceof \DOMNodeList) {
                 foreach ($obj as $node) {
                     if ($node instanceof \DOMAttr) {
-                        throw new ParsingHelperException("A DOMNodeList must contain only DOMAttr or DOMNode nodes");
+                        throw new ParsingHelperException('A DOMNodeList must contain only DOMAttr or DOMNode nodes');
                     }
                     $d->documentElement->appendChild($d->importNode($node, true));
                 }
@@ -211,7 +212,7 @@ class BaseParsingHelper {
     {
         $xpath = new \DOMXPath($document);
 
-        $ns = $namespaceMappings ? : $this->implicitNamespaces;
+        $ns = $namespaceMappings ?: $this->implicitNamespaces;
 
         foreach ($ns as $prefix => $url) {
             if ($prefix) {
@@ -227,6 +228,7 @@ class BaseParsingHelper {
         $d = new Document();
         $d->resolveExternals = true; // Externe Dateien (aus der DTD) bei der Auflösung von Entities beachten. Falls nicht, sind die Entities nicht bekannt.
         $d->substituteEntities = false; // Entities nicht expandieren
+
         return $d;
     }
 
@@ -243,6 +245,7 @@ class BaseParsingHelper {
     protected function sanitize($s)
     {
         $s = preg_replace('_<esi:[^>]+>_', '<![CDATA[$0]]>', $s); // escape <esi:...> placeholders
+
         return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', ' ', $s);
     }
 }
