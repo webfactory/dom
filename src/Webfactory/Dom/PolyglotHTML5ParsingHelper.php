@@ -8,10 +8,8 @@
 
 namespace Webfactory\Dom;
 
-use Webfactory\Dom\BaseParser;
-
-class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
-
+class PolyglotHTML5ParsingHelper extends HTMLParsingHelper
+{
     // HTML-Entities fixen als Bequemlichkeit für legacy (Case 12739)
     protected function sanitize($xml)
     {
@@ -25,7 +23,7 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
             $xml
         );
 
-        $decoded = html_entity_decode($escaped, ENT_QUOTES, 'UTF-8');
+        $decoded = html_entity_decode($escaped, \ENT_QUOTES, 'UTF-8');
 
         return $decoded;
     }
@@ -35,7 +33,7 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
         $dump = parent::fixDump($dump);
 
         // http://www.w3.org/TR/html-polyglot/#empty-elements
-        static $voidElements = array(
+        static $voidElements = [
             'area',
             'base',
             'br',
@@ -49,13 +47,13 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper {
             'link',
             'meta',
             'param',
-            'source'
-        );
+            'source',
+        ];
 
-        preg_match_all('_<((?!\w+:)(\w+)[^>]*)/>_', $dump, $matches, PREG_SET_ORDER);
+        preg_match_all('_<((?!\w+:)(\w+)[^>]*)/>_', $dump, $matches, \PREG_SET_ORDER);
 
         foreach ($matches as $m) {
-            if (!in_array($m[2], $voidElements)) {
+            if (!\in_array($m[2], $voidElements)) {
                 $dump = str_replace($m[0], "<{$m[1]}></{$m[2]}>", $dump);
             }
         }
