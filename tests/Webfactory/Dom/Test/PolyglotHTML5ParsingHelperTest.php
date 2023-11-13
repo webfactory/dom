@@ -10,7 +10,8 @@ namespace Webfactory\Dom\Test;
 
 use Webfactory\Dom\PolyglotHTML5ParsingHelper;
 
-class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest {
+class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
+{
     protected function createParsingHelper()
     {
         return new PolyglotHTML5ParsingHelper();
@@ -123,7 +124,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest {
                 ... should be used to achieve the same semantics for HTML5-aware and XML-only parsers.
             */
             '<html><body><p>test</p></body></html>',
-            '//p'
+            '//p',
         ];
 
         yield 'HTML document that uses a default namespace' => [
@@ -138,7 +139,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest {
                 according to the current HTML variant (XHTML vs HTML5) in use.
             */
             '<html xmlns="http://www.w3.org/1999/xhtml"><body><p>test</p></body></html>',
-            '//html:p'
+            '//html:p',
         ];
 
         yield 'HTML document with explicit namespace' => [
@@ -146,7 +147,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest {
                 Basically, as before, this time using an explicit namespace prefix.
             */
             '<html xmlns:foo="http://www.w3.org/1999/xhtml"><foo:body><foo:p>test</foo:p></foo:body></html>',
-            '//html:p'
+            '//html:p',
         ];
     }
 
@@ -177,7 +178,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest {
                 prefix set up in xpath expressions.
             */
             '<p>test</p>',
-            '//html:p'
+            '//html:p',
         ];
     }
 }
