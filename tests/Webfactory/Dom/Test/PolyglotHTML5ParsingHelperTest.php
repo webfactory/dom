@@ -8,11 +8,13 @@
 
 namespace Webfactory\Dom\Test;
 
+use Webfactory\Dom\PolyglotHTML5ParsingHelper;
+
 class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
 {
     protected function createParsingHelper()
     {
-        return new \Webfactory\Dom\PolyglotHTML5ParsingHelper();
+        return new PolyglotHTML5ParsingHelper();
     }
 
     /**
@@ -87,5 +89,96 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
         $this->readDumpAssertFragment(
             '<div><svg xmlns="http://www.w3.org/2000/svg" class="x" width="300" height="150" viewBox="0 0 300 150"><path fill="#FF7949" d="M300 5.49c0-2.944-1.057-4.84-2.72-5.49h-2.92c-.79.247-1.632.67-2.505 1.293L158.145 96.56c-4.48 3.19-11.81 3.19-16.29 0L8.146 1.292C7.27.67 6.43.247 5.64 0H2.72C1.056.65 0 2.546 0 5.49V150h300V5.49z"></path></svg></div>'
         );
+    }
+
+    /**
+     * @test
+     * @dataProvider provideXpathForDocuments
+     */
+    public function xpathParseDocument($xml, $xpathExpression)
+    {
+        $document = $this->parser->parseDocument($xml);
+        $xpath = $this->parser->createXPath($document);
+
+        $domNodeList = $xpath->query($xpathExpression);
+
+        self::assertCount(1, $domNodeList);
+        self::assertSame('test', $domNodeList[0]->textContent);
+    }
+
+    public function provideXpathForDocuments()
+    {
+        yield 'HTML document that does not use a default namespace' => [
+            /*
+                In this document, nodes are not in a namespace at all. Thus, we have to use the
+                XPath expression "//p" which searches for an item _not associated with a namespace_.
+
+                Note that this _should not be done in practice_, since HTML5 has a built-in, undeclared "native"
+                default namespace for the <html> element.
+
+                The libxml XML parser, however, does not know about HTML5 - only about XML. This is why the
+                Polyglot spec (https://www.w3.org/TR/html-polyglot/#h4_element-level-namespaces) states that
+
+                <html xmlns="http://www.w3.org/1999/xhtml">
+
+                ... should be used to achieve the same semantics for HTML5-aware and XML-only parsers.
+            */
+            '<html><body><p>test</p></body></html>',
+            '//p',
+        ];
+
+        yield 'HTML document that uses a default namespace' => [
+            /*
+                In this document, a default namespace is used. All nodes are associated with this namespace.
+                The XPath expression has to match namespaced nodes, and "//p" would be a node _without_ a
+                namespace. -> We have to register a namespace on the Xpath expression, and use its prefix.
+
+                If we don't give an explicit namespace mapping when creating the xpath expression, the
+                \Webfactory\Dom\BaseParsingHelper::createXPath() will register the ParsingHelper's implicit
+                namespaces for us as convenience. That includes the "html" namespace prefix for the URI
+                according to the current HTML variant (XHTML vs HTML5) in use.
+            */
+            '<html xmlns="http://www.w3.org/1999/xhtml"><body><p>test</p></body></html>',
+            '//html:p',
+        ];
+
+        yield 'HTML document with explicit namespace' => [
+            /*
+                Basically, as before, this time using an explicit namespace prefix.
+            */
+            '<html xmlns:foo="http://www.w3.org/1999/xhtml"><foo:body><foo:p>test</foo:p></foo:body></html>',
+            '//html:p',
+        ];
+    }
+
+    /**
+     * @test
+     * @dataProvider provideXpathForFragments
+     */
+    public function xpathParseFragment($xmlFragment, $xpathExpression)
+    {
+        $fragment = $this->parser->parseFragment($xmlFragment);
+        $xpath = $this->parser->createXPath($fragment);
+
+        $domNodeList = $xpath->query($xpathExpression);
+
+        self::assertCount(1, $domNodeList);
+        self::assertSame('test', $domNodeList[0]->textContent);
+    }
+
+    public function provideXpathForFragments()
+    {
+        yield 'default namespace assumed for fragments' => [
+            /*
+                When BaseParsingHelper::parseFragment() is used without passing a mapping of
+                namespaces, a 'default' assumption is made depending on the ParsingHelper instance.
+
+                For HTML5, this assumes fragment elements without namespace declarations live in the
+                http://www.w3.org/1999/xhtml namespace URI; this corresponds to the 'html' convenience
+                prefix set up in xpath expressions.
+            */
+            '<p>test</p>',
+            '//html:p',
+        ];
     }
 }

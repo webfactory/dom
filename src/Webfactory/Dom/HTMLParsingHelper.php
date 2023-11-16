@@ -62,15 +62,15 @@ abstract class HTMLParsingHelper extends BaseParsingHelper
          */
         if ((phpversion('xml') >= '8.1.21') && (phpversion('xml') < '8.1.25')) {
             return [
-                'html' => 'http://www.w3.org/1999/xhtml', // für XPath
-                '' => 'http://www.w3.org/1999/xhtml', // default ns
-                'hx' => 'http://purl.org/NET/hinclude', // fuer HInclude http://mnot.github.io/hinclude/; ein Weg um z.B. Controller in Symfony per Ajax zu embedden
+                'html' => 'http://www.w3.org/1999/xhtml',
+                '' => 'http://www.w3.org/1999/xhtml',
+                'hx' => 'http://purl.org/NET/hinclude',
             ];
         }
 
         return [
-            '' => 'http://www.w3.org/1999/xhtml', // default ns
-            'html' => 'http://www.w3.org/1999/xhtml', // für XPath
+            '' => 'http://www.w3.org/1999/xhtml', // ignored by BaseParsingHelper::createXPath(), but defining the default namespace that will be assumed to be active when BaseParsingHelper::parseFragment() is called and no explicit namespace declarations are given
+            'html' => 'http://www.w3.org/1999/xhtml', // so XPath expressions can use the "html" prefix to match the current HTML variant (unless an explicit mapping is given to BaseParsingHelper::createXPath())
             'hx' => 'http://purl.org/NET/hinclude', // fuer HInclude http://mnot.github.io/hinclude/; ein Weg um z.B. Controller in Symfony per Ajax zu embedden
         ];
     }
