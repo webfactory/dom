@@ -13,6 +13,7 @@ jobs:
             fail-fast: false
             matrix:
                 php-version: [ '7.2', '7.4', '8.1', '8.2' ]
+                coverage: none
                 dependency-version: [ prefer-stable ]
 
         name: PHP ${{ matrix.php-version }} - ${{ matrix.dependency-version }}
@@ -23,6 +24,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php-version }}
+                    coverage: none
                     extensions: dom
             -   name: Install dependencies
                 run: composer update --no-interaction --prefer-dist --${{ matrix.dependency-version}} --no-progress --no-suggest
