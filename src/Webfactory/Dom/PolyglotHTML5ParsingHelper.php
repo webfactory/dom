@@ -50,7 +50,7 @@ class PolyglotHTML5ParsingHelper extends HTMLParsingHelper
             'source',
         ];
 
-        preg_match_all('_<((?!\w+:)(\w+)[^>]*)/>_', $dump, $matches, \PREG_SET_ORDER);
+        preg_match_all('_<((?![\w-]+:)([\w-]+)[^>]*)/>_', $dump, $matches, \PREG_SET_ORDER);
 
         foreach ($matches as $m) {
             if (!\in_array($m[2], $voidElements)) {
