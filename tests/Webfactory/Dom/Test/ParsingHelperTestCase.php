@@ -10,7 +10,7 @@ namespace Webfactory\Dom\Test;
 
 use PHPUnit\Framework\TestCase;
 
-abstract class ParsingHelperTest extends TestCase
+abstract class ParsingHelperTestCase extends TestCase
 {
     /** @var \Webfactory\Dom\BaseParsingHelper */
     protected $parser;
@@ -27,7 +27,7 @@ abstract class ParsingHelperTest extends TestCase
         $result = null,
         $declaredNamespacesInDump = null,
         $declaredNamespacesInRead = null
-    ) {
+    ): void {
         if (!$result) {
             $result = $fragment;
         }
