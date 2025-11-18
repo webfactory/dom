@@ -1,4 +1,5 @@
 <?php
+
 /*
  * (c) webfactory GmbH <info@webfactory.de>
  *
@@ -26,7 +27,7 @@ abstract class ParsingHelperTestCase extends TestCase
         $fragment,
         $result = null,
         $declaredNamespacesInDump = null,
-        $declaredNamespacesInRead = null
+        $declaredNamespacesInRead = null,
     ): void {
         if (!$result) {
             $result = $fragment;
