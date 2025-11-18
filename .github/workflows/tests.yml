@@ -6,27 +6,33 @@ on:
             - master
     pull_request:
 
+env:
+    SYMFONY_DEPRECATIONS_HELPER: weak
+
 jobs:
-    build:
-        runs-on: ubuntu-latest
+    PHPUnit:
+        runs-on: ubuntu-22.04
         strategy:
             fail-fast: false
             matrix:
-                php-version: [ '7.2', '7.4', '8.1', '8.2' ]
-                coverage: none
-                dependency-version: [ prefer-stable ]
-
-        name: PHP ${{ matrix.php-version }} - ${{ matrix.dependency-version }}
-
+                include:
+                    - { php-version: 8.1, dependency-version: prefer-lowest }
+                    - { php-version: 8.3, dependency-version: prefer-stable }
+                    - { php-version: 8.4, dependency-version: prefer-stable }
+        name: PHPUnit (PHP ${{matrix.php-version}}, ${{ matrix.dependency-version }})
         steps:
             -   uses: actions/checkout@v4
-            -   name: Install PHP
-                uses: shivammathur/setup-php@v2
+            -   uses: shivammathur/setup-php@v2
                 with:
-                    php-version: ${{ matrix.php-version }}
-                    coverage: none
-                    extensions: dom
-            -   name: Install dependencies
-                run: composer update --no-interaction --prefer-dist --${{ matrix.dependency-version}} --no-progress --no-suggest
-            -   name: Run test suite
-                run: vendor/bin/phpunit
+                  php-version: ${{ matrix.php-version }}
+                  coverage: none
+                  tools: composer:v2
+            -   uses: actions/cache@v4
+                with:
+                    path: vendor
+                    key: composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependency-version }}-${{ hashFiles('composer.json') }}
+                    restore-keys: |
+                        composer-${{ runner.os }}-${{ matrix.php-version }}-${{ matrix.dependency-version }}-
+            -   run: composer update --${{ matrix.dependency-version }} --no-interaction --no-scripts --no-progress --ansi
+            -   run: composer show
+            -   run: vendor/bin/phpunit --display-warnings --display-deprecations
