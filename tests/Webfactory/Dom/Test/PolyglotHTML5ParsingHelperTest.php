@@ -10,9 +10,9 @@ namespace Webfactory\Dom\Test;
 
 use Webfactory\Dom\PolyglotHTML5ParsingHelper;
 
-class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
+class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTestCase
 {
-    protected function createParsingHelper()
+    protected function createParsingHelper(): PolyglotHTML5ParsingHelper
     {
         return new PolyglotHTML5ParsingHelper();
     }
@@ -20,7 +20,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
     /**
      * @test
      */
-    public function voidTagsArePreservedWhileEmptyTagsAreExpanded()
+    public function voidTagsArePreservedWhileEmptyTagsAreExpanded(): void
     {
         $this->readDumpAssertFragment(
             '<area/><base/><br/><col/><command/><embed/><hr/><img/><input/><keygen/><link/><meta/><param/><source/>'
@@ -32,7 +32,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
     /**
      * @test
      */
-    public function htmlEntitiesSupportedAsConvenience()
+    public function htmlEntitiesSupportedAsConvenience(): void
     {
         // webfactory Case 12739,
         // http://dev.w3.org/html5/html-xhtml-author-guide/#named-entity-references
@@ -56,7 +56,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
     /**
      * @test
      */
-    public function svgNamespaceIsNotReconciled()
+    public function svgNamespaceIsNotReconciled(): void
     {
         /*
          * libxml2 will attempt (under which circumstances?) to reconciliate namespace declarations, that is, find
@@ -95,7 +95,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
      * @test
      * @dataProvider provideXpathForDocuments
      */
-    public function xpathParseDocument($xml, $xpathExpression)
+    public function xpathParseDocument($xml, $xpathExpression): void
     {
         $document = $this->parser->parseDocument($xml);
         $xpath = $this->parser->createXPath($document);
@@ -106,7 +106,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
         self::assertSame('test', $domNodeList[0]->textContent);
     }
 
-    public function provideXpathForDocuments()
+    public static function provideXpathForDocuments(): ?\Generator
     {
         yield 'HTML document that does not use a default namespace' => [
             /*
@@ -155,7 +155,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
      * @test
      * @dataProvider provideXpathForFragments
      */
-    public function xpathParseFragment($xmlFragment, $xpathExpression)
+    public function xpathParseFragment($xmlFragment, $xpathExpression): void
     {
         $fragment = $this->parser->parseFragment($xmlFragment);
         $xpath = $this->parser->createXPath($fragment);
@@ -166,7 +166,7 @@ class PolyglotHTML5ParsingHelperTest extends HTMLParsingHelperTest
         self::assertSame('test', $domNodeList[0]->textContent);
     }
 
-    public function provideXpathForFragments()
+    public static function provideXpathForFragments(): ?\Generator
     {
         yield 'default namespace assumed for fragments' => [
             /*

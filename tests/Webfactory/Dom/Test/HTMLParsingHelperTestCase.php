@@ -8,12 +8,12 @@
 
 namespace Webfactory\Dom\Test;
 
-abstract class HTMLParsingHelperTest extends ParsingHelperTest
+abstract class HTMLParsingHelperTestCase extends ParsingHelperTestCase
 {
     /**
      * @test
      */
-    public function scriptWithCDataIsPreserved()
+    public function scriptWithCDataIsPreserved(): void
     {
         $this->readDumpAssertFragment('
             <script type="text/javascript" xml:space="preserve">
@@ -27,7 +27,7 @@ abstract class HTMLParsingHelperTest extends ParsingHelperTest
     /**
      * @test
      */
-    public function esiTagIsPreserved()
+    public function esiTagIsPreserved(): void
     {
         $this->readDumpAssertFragment('<p>Test <esi:include foo="bar"/></p>');
     }
@@ -35,7 +35,7 @@ abstract class HTMLParsingHelperTest extends ParsingHelperTest
     /**
      * @test
      */
-    public function esiTagWithXMLSpecialCharsIsPreserved()
+    public function esiTagWithXMLSpecialCharsIsPreserved(): void
     {
         $this->readDumpAssertFragment('<p>Test <esi:include foo="http://foo.bar?one=two&three=four"/></p>');
     }

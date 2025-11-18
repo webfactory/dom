@@ -8,9 +8,9 @@
 
 namespace Webfactory\Dom\Test;
 
-class XHTML10ParsingHelperTest extends HTMLParsingHelperTest
+class XHTML10ParsingHelperTest extends HTMLParsingHelperTestCase
 {
-    protected function createParsingHelper()
+    protected function createParsingHelper(): \Webfactory\Dom\XHTML10ParsingHelper
     {
         return new \Webfactory\Dom\XHTML10ParsingHelper();
     }
@@ -18,7 +18,7 @@ class XHTML10ParsingHelperTest extends HTMLParsingHelperTest
     /**
      * @test
      */
-    public function entireDocumentIsPreserved()
+    public function entireDocumentIsPreserved(): void
     {
         $entireDocument = <<<XML
 <?xml version="1.0"?>
@@ -45,7 +45,7 @@ XML;
     /**
      * @test
      */
-    public function incompleteDocumentIsFixed()
+    public function incompleteDocumentIsFixed(): void
     {
         $missingNSDecl = <<<XML
 <?xml version="1.0"?>
@@ -66,7 +66,7 @@ XML;
     /**
      * @test
      */
-    public function voidTagsArePreservedWhileEmptyTagsAreExpanded()
+    public function voidTagsArePreservedWhileEmptyTagsAreExpanded(): void
     {
         $this->readDumpAssertFragment(
             '<area/><base/><br/><col/><hr/><img/><input/><link/><meta/><param/>',
