@@ -6,7 +6,7 @@
         {
             "name": "webfactory GmbH",
             "email": "info@webfactory.de",
-            "homepage": "http://www.webfactory.de",
+            "homepage": "https://www.webfactory.de",
             "role": "Developer"
         }
     ],
@@ -20,12 +20,12 @@
     },
     "autoload": {
         "psr-4": {
-            "": "src/"
+            "Webfactory\\Dom\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "": "tests/"
+            "Webfactory\\Dom\\Test\\": "tests/"
         }
     },
     "config": {
