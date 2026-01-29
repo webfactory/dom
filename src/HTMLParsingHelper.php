@@ -19,7 +19,7 @@ abstract class HTMLParsingHelper extends BaseParsingHelper
 
         libxml_set_external_entity_loader(function ($public, $system, $context) {
             if (isset($public)) {
-                $catalogDir = __DIR__.'/../../../xml-catalog/';
+                $catalogDir = __DIR__.'/../xml-catalog/';
                 switch ($public) {
                     case '-//W3C//DTD XHTML 1.0 Strict//EN':
                         return $catalogDir.'xhtml1-strict.dtd';
